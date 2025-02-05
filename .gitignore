@@ -1,0 +1,55 @@
+# **🔹 Python 関連**
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+.Python
+.env
+.venv/
+venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# **🔹 VSCode 関連**
+.vscode/
+*.code-workspace
+
+# **🔹 環境変数 & APIキー**
+.env
+*.secrets
+config.json
+
+# **🔹 macOS 関連（不要なシステムファイル）**
+.DS_Store
+
+# **🔹 ログファイル**
+logs/
+*.log
+
+# **🔹 一時ファイル**
+*.bak
+*.swp
+*.swo
+*.tmp
+
+# **🔹 Jupyter Notebook のチェックポイント**
+.ipynb_checkpoints/
+
+# **🔹 バイナリファイル**
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.ico
+*.mp4
+*.mov
+*.avi
+
+# **🔹 Excel ファイル（データ管理）**
+*.xlsx
+*.xls
+*.csv
+
+# **🔹 PyCharm関連（開発環境を統一するため）**
+.idea/
