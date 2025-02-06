@@ -91,8 +91,10 @@ def save_pages_to_excel(pages, filename):
     print(f"Saved {len(pages)} records to {filename}")
 
 if __name__ == "__main__":
-    # Dataフォルダにある店舗データExcelファイルを読み込み
-    input_file = os.path.join("Data", "indoor_golf_places_sorted.xlsx")
+    # 現在のスクリプト（srcフォルダ内）のディレクトリを取得
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # 親ディレクトリ内の data フォルダから Excel ファイルを読み込む
+    input_file = os.path.join(script_dir, "..", "data", "indoor_golf_sorted.xlsx")
     try:
         stores_df = pd.read_excel(input_file)
     except Exception as e:
@@ -125,6 +127,6 @@ if __name__ == "__main__":
             }
             all_results.append(result)
     
-    # Dataフォルダに結果をExcelファイルとして出力
-    output_file = os.path.join("Data", "crawled_indoor_golf_websites.xlsx")
+    # 親ディレクトリ内の data フォルダに結果をExcelファイルとして出力
+    output_file = os.path.join(script_dir, "..", "data", "crawled_indoor_golf_websites.xlsx")
     save_pages_to_excel(all_results, output_file)
