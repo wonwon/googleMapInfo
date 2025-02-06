@@ -1,14 +1,14 @@
+import os
+import time
+from urllib.parse import urljoin, urlparse
+
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin, urlparse
-import pandas as pd
-import time
-import os
+
 
 def is_valid_url(url):
-    """
-    URLの形式が正しいかチェックする関数
-    """
+    """URLの形式が正しいかチェックする関数"""
     try:
         result = urlparse(url)
         return all([result.scheme, result.netloc])
@@ -20,8 +20,8 @@ def crawl_website(root_url):
     指定したルートURL以下の内部ページを再帰的にクロールし、
     各ページのURL、タイトル、及びInstagramリンクを取得する関数
     """
-    visited = set()    # 訪問済みURLのセット
-    pages = []         # 各ページの情報を格納するリスト
+    visited = set()      # 訪問済みURLのセット
+    pages = []           # 各ページの情報を格納するリスト
     to_visit = [root_url]  # クロール対象のURLリスト
 
     # ルートURLのドメイン情報を取得
@@ -83,27 +83,48 @@ def crawl_website(root_url):
     return pages
 
 def save_pages_to_excel(pages, filename):
-    """
-    ページ情報のリストをExcelファイルに出力する関数
-    """
+    """ページ情報のリストをExcelファイルに出力する関数"""
     df = pd.DataFrame(pages)
     df.to_excel(filename, index=False)
     print(f"Saved {len(pages)} records to {filename}")
 
 if __name__ == "__main__":
-    # 現在のスクリプト（srcフォルダ内）のディレクトリを取得
+    # srcフォルダ内のスクリプトのディレクトリを取得
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    # 親ディレクトリ内の data フォルダから Excel ファイルを読み込む
-    input_file = os.path.join(script_dir, "..", "data", "indoor_golf_sorted.xlsx")
+    # 親ディレクトリ内の data フォルダ内の Excel ファイルのパスを構築
+    input_file = os.path.join(script_dir, "..", "data", "indoor_golf_places_sorted.xlsx")
+    
     try:
         stores_df = pd.read_excel(input_file)
+        print(f"Excelファイルの読み込みに成功しました: {input_file}")
     except Exception as e:
         print(f"Excelファイルの読み込みエラー: {e}")
         exit(1)
+    
+    # Excelファイルが空でないか確認
+    if stores_df.empty:
+        print("Excelファイルに店舗データがありません。")
+        exit(1)
+
+    # 取得する店舗データの開始位置（1-indexed）と件数をユーザーに入力してもらう
+    try:
+        start_index = int(input("取得開始店舗番号（1からの番号、例：3）: "))
+        count = int(input("取得する店舗件数（例：5）: "))
+    except Exception as e:
+        print(f"入力エラー: {e}")
+        exit(1)
+
+    # 1-indexed なので、Pythonの0-indexに変換
+    start_idx = start_index - 1
+    end_idx = start_idx + count
+
+    # 指定された範囲の店舗データを取得（ilocは0-indexed）
+    selected_stores_df = stores_df.iloc[start_idx:end_idx]
+    print(f"店舗データ {start_index} 番目から {start_index + count - 1} 番目を処理します。")
 
     all_results = []
     # 各店舗の「ウェブサイト」URLに対してクローラーを実行
-    for idx, row in stores_df.iterrows():
+    for idx, row in selected_stores_df.iterrows():
         store_name = row.get("店舗名", "")
         website_url = row.get("ウェブサイト", "")
         # ウェブサイトURLが空、または「なし」や「エラー」ならスキップ
@@ -127,6 +148,6 @@ if __name__ == "__main__":
             }
             all_results.append(result)
     
-    # 親ディレクトリ内の data フォルダに結果をExcelファイルとして出力
+    # 出力ファイルのパスを、親ディレクトリ内の data フォルダに設定
     output_file = os.path.join(script_dir, "..", "data", "crawled_indoor_golf_websites.xlsx")
     save_pages_to_excel(all_results, output_file)
